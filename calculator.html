@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Anilox Calculators</title>
+  <style>
+    body { font-family: sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px;
+                 border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    h1 { text-align: center; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+    .label { font-weight: bold; margin-bottom: 5px; }
+    input[type="number"], select, input[readonly] {
+      width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;
+    }
+    .gauge { width: 100%; position: relative; margin-top: 5em;}
+    .gauge svg { width: 100%; height: 100%; overflow: visible; }
+    .needle { stroke: #007ACC; stroke-width: 2; transform-origin: 100px 90px; transition: transform 0.2s; }
+    .BCM-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 auto; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Anilox Calculators</h1>
+    <!-- Anilox Volume Calculator -->
+    <div id="volume" class="calc active">
+      <div class="grid">
+          <div class="label">Screen LPI</div>
+          <select id="LPI">
+            <option value="LPI">Select LPI</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="label">Desired BCM</div>
+      <input type="number" step="0.1" id="bcmVolume" value="0.0" />
+
+      <div class="BCM-grid">
+        <div id="ultraflow box">
+          <h2>Ultraflow Standard</h2>
+          <p id="ultraflow value">-</p>
+        </div>
+        <div id="ultimate box">
+          <h2>Ultimate Volume</h2>
+          <p id="ultimate value">-</p>
+        </div>
+        <div id="admiral box">
+          <h2>Admiral</h2>
+          <p id="admiral value">-</p>
+        </div>
+      </div>
+
+      <div class="gauge">
+        <svg viewBox="0 0 200 100">
+
+          <!-- background arc -->
+          <path id="seg1" class="gauge-seg" stroke="#eee" stroke-width="20" fill="none" d="M10,90 A90,90 0 0,1 190,90"/>
+          <!-- needle -->
+          <line id="needle" x1="100" y1="90" x2="10" y2="90" class="needle"/>
+          <!-- label under gauge -->
+          <text id="gaugeLabel" x="100" y="105" text-anchor="middle"></text>
+        </svg>
+      </div>
+    </div>
+
+  <script>
+    const lpis = [
+       {
+        lpi:100,
+        ultimate: 18.4,
+        ultraflowMin: 15.3,
+        ultraflowMax: 21.5,
+        min: 0,
+        max: 35,
+      },
+      {
+        lpi:120,
+        ultimate: 15.2,
+        ultraflowMin: 14.8,
+        ultraflowMax: 17.7,
+        min: 0,
+        max: 40,
+      },
+      {
+        lpi:140,
+        ultimate: 12.7,
+        ultraflowMin: 11.5,
+        ultraflowMax: 14.0,
+        min: 0,
+        max: 30,
+      },
+      {
+        lpi:165,
+        ultimate: 10.7,
+        ultraflowMin: 9.7,
+        ultraflowMax: 11.5,
+        min: 0,
+        max: 30,
+      },
+      {
+        lpi: 180,
+        ultimate: 9.7,
+        ultraflowMin: 9.0,
+        ultraflowMax: 10.5,
+        min: 0,
+        max: 30,
+      },
+      {
+        lpi: 200,
+        ultimate: 8.7,
+        ultraflowMin: 6.8,
+        ultraflowMax: 10.0,
+        min: 0,
+        max: 30,
+      },
+      {
+        lpi: 220,
+        ultimate: 7.8,
+        ultraflowMin: 7.0,
+        ultraflowMax: 8.5,
+        min: 0,
+        max: 23,
+      },
+      {
+        lpi: 240,
+        ultimate: 7.3,
+        ultraflowMin: 6.7,
+        ultraflowMax: 8.0,
+        min: 0,
+        max: 23,
+      },
+      {
+        lpi: 250,
+        ultimate: 6.9,
+        ultraflowMin: 6.5,
+        ultraflowMax: 7.8,
+        min: 0,
+        max: 23,
+      },
+      {
+        lpi: 260,
+        ultimate: 6.6,
+        ultraflowMin: 6.0,
+        ultraflowMax: 7.5,
+        min: 0,
+        max: 20,
+      },
+      {
+        lpi: 280,
+        ultimate: 6.0,
+        ultraflowMin: 5.5,
+        ultraflowMax: 6.8,
+        min: 0,
+        max: 20,
+      },
+      {
+        lpi: 300,
+        ultimate: 5.5,
+        ultraflowMin: 5.0,
+        ultraflowMax: 6.1,
+        min: 0,
+        max: 20,
+      },
+      {
+        lpi: 330,
+        ultimate: 5.0,
+        ultraflowMin: 4.6,
+        ultraflowMax: 5.6,
+        min: 0,
+        max: 20,
+      },
+      {
+        lpi: 360,
+        ultimate: 4.6,
+        ultraflowMin: 4.0,
+        ultraflowMax: 7.1,
+        admiralMin: 7.2,
+        admiralMax: 9.0,
+        min: 0,
+        max: 20,
+      },
+      {
+        lpi: 400,
+        ultimate: 4.0,
+        ultraflowMin: 3.5,
+        ultraflowMax: 5.9,
+        admiralMin: 6.0,
+        admiralMax: 7.5,
+        min: 0,
+        max: 18,
+      },
+      {
+        lpi: 440,
+        ultimate: 3.6,
+        ultraflowMin: 3.2,
+        ultraflowMax: 5.3,
+        admiralMin: 5.4,
+        admiralMax: 6.7,
+        min: 0,
+        max: 16,
+      },
+      {
+        lpi: 500,
+        ultimate: 3.2,
+        ultraflowMin: 2.8,
+        ultraflowMax: 5.1,
+        admiralMin: 5.2,
+        admiralMax: 6.7,
+        min: 0,
+        max: 15,
+      },
+      {
+        lpi: 550,
+        ultimate: 2.9,
+        ultraflowMin: 2.6,
+        ultraflowMax: 4.9,
+        admiralMin: 5.0,
+        admiralMax: 6.6,
+        min: 0,
+        max: 14,
+      },
+      {
+        lpi: 600,
+        ultimate: 2.6,
+        ultraflowMin: 2.3,
+        ultraflowMax: 4.3,
+        admiralMin: 4.4,
+        admiralMax: 5.6,
+        min: 0,
+        max: 14,
+      },
+      {
+        lpi: 650,
+        ultimate: 2.3,
+        ultraflowMin: 2.0,
+        ultraflowMax: 4.0,
+        admiralMin: 4.1,
+        admiralMax: 5.2,
+        min: 0,
+        max: 14,
+      },
+      {
+        lpi: 700,
+        ultimate: 2.2,
+        ultraflowMin: 1.9,
+        ultraflowMax: 3.7,
+        admiralMin: 3.8,
+        admiralMax: 5.0,
+        min: 0,
+        max: 13,
+      },
+      {
+        lpi: 800,
+        ultimate: 1.9,
+        ultraflowMin: 1.7,
+        ultraflowMax: 3.9,
+        admiralMin: 4.0,
+        admiralMax: 4.4,
+        min: 0,
+        max: 12,
+      },
+      {
+        lpi: 900,
+        ultimate: 1.5,
+        ultraflowMin: 1.5,
+        ultraflowMax: 3.3,
+        admiralMin: 3.4,
+        admiralMax: 3.9,
+        min: 0,
+        max: 10,
+      },
+      {
+        lpi: 1000,
+        ultimate: 1.2,
+        ultraflowMin: 1.2,
+        ultraflowMax: 2.9,
+        admiralMin: 3.0,
+        admiralMax: 3.7,
+        min: 0,
+        max: 8,
+      },
+      {
+        lpi: 1200,
+        ultimate: 1.0,
+        ultraflowMin: 1.0,
+        ultraflowMax: 2.5,
+        admiralMin: 2.6,
+        admiralMax: 3.2,
+        min: 0,
+        max: 6,
+      },
+      {
+        lpi: 1400,
+        ultimate: 0.9,
+        ultraflowMin: 0.9,
+        ultraflowMax: 1.9,
+        admiralMin: 2.0,
+        admiralMax: 2.6,
+        min: 0,
+        max: 5,
+      },
+      {
+        lpi: 1500,
+        ultimate: 0.8,
+        ultraflowMin: 0.8,
+        ultraflowMax: 1.5,
+        admiralMin: 1.6,
+        admiralMax: 2.1,
+        min: 0,
+        max: 5,
+      },
+      {
+        lpi: 2000,
+        ultimate: 0.6,
+        admiralMin: 0.6,
+        admiralMax: 1.4,
+        min: 0,
+        max: 5,
+      },
+    ]
+
+    // ---- ANILOX VOLUME CALCULATOR ----
+    const lpiEl           = document.getElementById('LPI');
+    const gaugeArc        = document.getElementById('gaugeArc');
+    const needle          = document.getElementById('needle');
+    const gaugeLabel      = document.getElementById('gaugeLabel');
+    const ultraflowValueEl = document.getElementById('ultraflow value');
+    const ultimateValueEl = document.getElementById('ultimate value');
+    const admiralValueEl  = document.getElementById('admiral value');
+    const bcmVolumeEl     = document.getElementById('bcmVolume');
+
+    // Populate LPI dropdown
+    lpis.forEach(item => {
+      const option = document.createElement('option');
+      option.value = item.lpi;
+      option.textContent = `${item.lpi}`;
+      lpiEl.appendChild(option);
+    });
+
+  // Add Admiral, Ultimate, and Ultraflow values to the BCM grid based on seclection and update gauge
+    lpiEl.addEventListener('change', () => {
+      const selectedLPI = parseInt(lpiEl.value);
+      const lpiData = lpis.find(item => item.lpi === selectedLPI);
+
+      if (lpiData) {
+        ultraflowValueEl.textContent = `${lpiData.ultraflowMin?.toFixed(1) || 'N/A'} - ${lpiData.ultraflowMax?.toFixed(1) || 'N/A'}`;
+        ultimateValueEl.textContent = `${lpiData.ultimate?.toFixed(1) || 'N/A'}`;
+        admiralValueEl.textContent = `${lpiData.admiralMin?.toFixed(1) || 'N/A'} - ${lpiData.admiralMax?.toFixed(1) || 'N/A'}`;
+        // Set input min/max
+        bcmVolumeEl.min = lpiData.min;
+        bcmVolumeEl.max = lpiData.max;
+        // Optionally reset value to min or ultimate
+        bcmVolumeEl.value = lpiData.ultimate?.toFixed(1) || lpiData.min;
+      }
+      updateGauge();
+    });
+
+    // Update value of bcmVolumeEl when LPI changes
+    lpiEl.addEventListener('change', () => {
+      const selectedLPI = parseInt(lpiEl.value);
+      const lpiData = lpis.find(item => item.lpi === selectedLPI);
+      if (lpiData) {
+        bcmVolumeEl.value = lpiData.ultimate.toFixed(1);
+        updateGauge();
+      }
+    });
+
+    // Update gauge based on BCM input
+    bcmVolumeEl.addEventListener('input', updateGauge);
+
+    
+    function updateGauge() {
+      const bcmValue = parseFloat(bcmVolumeEl.value);
+      const selectedLPI = parseInt(lpiEl.value);
+      const lpiData = lpis.find(item => item.lpi === selectedLPI);
+
+      if (lpiData) {
+        // Calculate gauge value
+        const min = lpiData.min;
+        const max = lpiData.max;
+        const range = max - min;
+        const ultraflowMin = lpiData.ultraflowMin;
+        const ultraflowMax = lpiData.ultraflowMax;
+        const admiralMin = lpiData.admiralMin || 0;
+        const admiralMax = lpiData.admiralMax || 0;
+        const percentage = (bcmValue - min) / range;
+
+        // Clamp percentage between 0 and 1
+        const clampedPercentage = Math.max(0, Math.min(1, percentage));
+
+        // Rotate needle: 0deg (min, left) to 180deg (max, right), clockwise
+        const angle = 180 * clampedPercentage; // 0deg at min, 180deg at max (clockwise)
+        needle.style.transform = `rotate(${angle}deg)`;
+
+        // Update label
+        gaugeLabel.textContent = `${bcmValue.toFixed(1)} BCM`;
+      }
+    }
+
+    // Initial gauge update
+    updateGauge();     
+  </script>
+</body>
+</html>
