@@ -53,9 +53,18 @@
 
       <div class="gauge">
         <svg viewBox="0 0 200 100">
+          <defs>
+            <linearGradient id="arcGradient" gradientUnits="userSpaceOnUse" x1="10" y1="90" x2="190" y2="90">
+              <stop offset="0%" stop-color="red"/>
+              <stop offset="45%" stop-color="yellow"/>
+              <stop offset="50%" stop-color="green"/>
+              <stop offset="55%" stop-color="yellow"/>
+              <stop offset="100%" stop-color="red"/>
+            </linearGradient>
+          </defs>
 
           <!-- background arc -->
-          <path id="seg1" class="gauge-seg" stroke="#eee" stroke-width="20" fill="none" d="M10,90 A90,90 0 0,1 190,90"/>
+          <path id="seg1" class="gauge-seg" stroke="url(#arcGradient)" stroke-width="10" fill="none" d="M10,90 A90,90 0 0,1 190,90"/>
           <!-- needle -->
           <line id="needle" x1="100" y1="90" x2="10" y2="90" class="needle"/>
           <!-- label under gauge -->
@@ -72,7 +81,7 @@
         ultraflowMin: 15.3,
         ultraflowMax: 21.5,
         min: 0,
-        max: 35,
+        max: 37,
       },
       {
         lpi:120,
@@ -80,7 +89,7 @@
         ultraflowMin: 14.8,
         ultraflowMax: 17.7,
         min: 0,
-        max: 40,
+        max: 31,
       },
       {
         lpi:140,
@@ -88,7 +97,7 @@
         ultraflowMin: 11.5,
         ultraflowMax: 14.0,
         min: 0,
-        max: 30,
+        max: 25,
       },
       {
         lpi:165,
@@ -96,7 +105,7 @@
         ultraflowMin: 9.7,
         ultraflowMax: 11.5,
         min: 0,
-        max: 30,
+        max: 22,
       },
       {
         lpi: 180,
@@ -104,7 +113,7 @@
         ultraflowMin: 9.0,
         ultraflowMax: 10.5,
         min: 0,
-        max: 30,
+        max: 20,
       },
       {
         lpi: 200,
@@ -112,7 +121,7 @@
         ultraflowMin: 6.8,
         ultraflowMax: 10.0,
         min: 0,
-        max: 30,
+        max: 18,
       },
       {
         lpi: 220,
@@ -120,7 +129,7 @@
         ultraflowMin: 7.0,
         ultraflowMax: 8.5,
         min: 0,
-        max: 23,
+        max: 16,
       },
       {
         lpi: 240,
@@ -128,7 +137,7 @@
         ultraflowMin: 6.7,
         ultraflowMax: 8.0,
         min: 0,
-        max: 23,
+        max: 16,
       },
       {
         lpi: 250,
@@ -136,7 +145,7 @@
         ultraflowMin: 6.5,
         ultraflowMax: 7.8,
         min: 0,
-        max: 23,
+        max: 14,
       },
       {
         lpi: 260,
@@ -144,7 +153,7 @@
         ultraflowMin: 6.0,
         ultraflowMax: 7.5,
         min: 0,
-        max: 20,
+        max: 14,
       },
       {
         lpi: 280,
@@ -152,7 +161,7 @@
         ultraflowMin: 5.5,
         ultraflowMax: 6.8,
         min: 0,
-        max: 20,
+        max: 12,
       },
       {
         lpi: 300,
@@ -160,7 +169,7 @@
         ultraflowMin: 5.0,
         ultraflowMax: 6.1,
         min: 0,
-        max: 20,
+        max: 11,
       },
       {
         lpi: 330,
@@ -168,7 +177,7 @@
         ultraflowMin: 4.6,
         ultraflowMax: 5.6,
         min: 0,
-        max: 20,
+        max: 10,
       },
       {
         lpi: 360,
@@ -178,7 +187,7 @@
         admiralMin: 7.2,
         admiralMax: 9.0,
         min: 0,
-        max: 20,
+        max: 10,
       },
       {
         lpi: 400,
@@ -188,7 +197,7 @@
         admiralMin: 6.0,
         admiralMax: 7.5,
         min: 0,
-        max: 18,
+        max: 8,
       },
       {
         lpi: 440,
@@ -198,7 +207,7 @@
         admiralMin: 5.4,
         admiralMax: 6.7,
         min: 0,
-        max: 16,
+        max: 8,
       },
       {
         lpi: 500,
@@ -208,7 +217,7 @@
         admiralMin: 5.2,
         admiralMax: 6.7,
         min: 0,
-        max: 15,
+        max: 6,
       },
       {
         lpi: 550,
@@ -218,7 +227,7 @@
         admiralMin: 5.0,
         admiralMax: 6.6,
         min: 0,
-        max: 14,
+        max: 6,
       },
       {
         lpi: 600,
@@ -228,7 +237,7 @@
         admiralMin: 4.4,
         admiralMax: 5.6,
         min: 0,
-        max: 14,
+        max: 6,
       },
       {
         lpi: 650,
@@ -238,7 +247,7 @@
         admiralMin: 4.1,
         admiralMax: 5.2,
         min: 0,
-        max: 14,
+        max: 6,
       },
       {
         lpi: 700,
@@ -248,7 +257,7 @@
         admiralMin: 3.8,
         admiralMax: 5.0,
         min: 0,
-        max: 13,
+        max: 6,
       },
       {
         lpi: 800,
@@ -329,6 +338,9 @@
     const ultimateValueEl = document.getElementById('ultimate value');
     const admiralValueEl  = document.getElementById('admiral value');
     const bcmVolumeEl     = document.getElementById('bcmVolume');
+    const arcGreen        = document.querySelector('#arcGradient stop:nth-child(3)');
+    const arcYellow1       = document.querySelector('#arcGradient stop:nth-child(2)');
+    const arcYellow2          = document.querySelector('#arcGradient stop:nth-child(4)');
 
     // Populate LPI dropdown
     lpis.forEach(item => {
@@ -352,6 +364,10 @@
         bcmVolumeEl.max = lpiData.max;
         // Optionally reset value to min or ultimate
         bcmVolumeEl.value = lpiData.ultimate?.toFixed(1) || lpiData.min;
+        arcGreen.setAttribute('offset', `${(lpiData.ultimate / lpiData.max) * 100}%`);
+        arcYellow1.setAttribute('offset', `${(lpiData.ultraflowMin / lpiData.max) * 100}%`);
+        arcGreen.setAttribute('offset', `${(lpiData.ultimate / lpiData.max) * 100}%`);
+        arcYellow2.setAttribute('offset', `${(lpiData.admiralMin / lpiData.max) * 100 || (lpiData.ultraflowMax / lpiData.max) * 100}%`);
       }
       updateGauge();
     });
