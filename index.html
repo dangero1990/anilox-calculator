@@ -5,19 +5,185 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Anilox Calculators</title>
   <style>
-    body { font-family: sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
-    .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px;
-                 border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    h1 { text-align: center; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-    .label { font-weight: bold; margin-bottom: 5px; }
-    input[type="number"], select, input[readonly] {
-      width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;
+    :root{
+      --cts-blue: #0085CA;
+      --cts-black: #030C14;
     }
-    .gauge { width: 100%; position: relative; margin-top: 5em;}
-    .gauge svg { width: 100%; height: 100%; overflow: visible; }
-    .needle { stroke: #007ACC; stroke-width: 2; transform-origin: 100px 90px; transition: transform 0.2s; }
-    .BCM-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 auto; text-align: center; }
+    body { 
+      font-family: sans-serif; 
+      background: var(--cts-black); 
+      margin: 0; 
+      padding: 20px; 
+    }
+    .container { 
+      max-width: 600px; 
+      margin: 0 auto; 
+      background: #fff;
+      padding: 4em;
+      border-radius: 16px;  
+      border: 2px solid var(--cts-blue);
+    }
+    h1 { 
+      text-align: center; 
+    }
+    .grid { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 10px; 
+      margin-bottom: 20px; 
+    }
+    .label { 
+      font-weight: bold; 
+      margin-bottom: 5px; 
+    }
+    input[type="number"], select, input[readonly] {
+      width: 100%; 
+      padding: 8px; 
+      border: 1px solid #ccc; 
+      border-radius: 4px;
+    }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      margin: 0;
+      -webkit-appearance: none;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    .bcm-control {
+      display: grid;
+      gap: 10px;
+    }
+    .bcm-step-buttons {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .bcm-step-button {
+      min-height: 48px;
+      border: 0;
+      border-radius: 6px;
+      background: #25313d;
+      color: #fff;
+      cursor: pointer;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1;
+      transition: background-color 0.18s ease, transform 0.18s ease;
+    }
+    .bcm-step-button:hover {
+      background: var(--cts-blue)
+    }
+    .bcm-step-button:active {
+      transform: translateY(1px);
+    }
+    .gauge {
+      width: min(100%, 520px);
+      margin: 58px auto 0;
+      position: relative;
+    }
+    .gauge svg {
+      width: 100%;
+      aspect-ratio: 260 / 176;
+      display: block;
+      overflow: visible;
+    }
+    .gauge-track,
+    .gauge-range,
+    .gauge-ideal {
+      fill: none;
+      stroke-linecap: butt;
+    }
+    .gauge-track {
+      stroke: #e11b22;
+      stroke-width: 34;
+      filter: drop-shadow(0 4px 5px rgba(17, 24, 39, 0.18));
+    }
+    .gauge-range {
+      stroke: #ffd200;
+      stroke-width: 34;
+    }
+    .gauge-ideal {
+      stroke: #008f2f;
+      stroke-width: 36;
+    }
+    .gauge-tick {
+      stroke: #000;
+      stroke-linecap: square;
+      filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.32));
+    }Desire
+    .gauge-tick-minor {
+      opacity: 0.92;
+      stroke-width: 1.3;
+    }
+    .gauge-tick-major {
+      opacity: 1;
+      stroke-width: 2.2;
+    }
+    .gauge-tick-label {
+      fill: #25313d;
+      font-size: 8px;
+      font-weight: 700;
+    }
+    .needle {
+      stroke: var(--cts-blue);
+      stroke-width: 3.5;
+      stroke-linecap: round;
+      transition: transform 0.25s ease;
+      transform-box: view-box;
+      transform-origin: 130px 120px;
+      filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25));
+    }
+    .needle-cap {
+      fill: var(--cts-blue);
+      stroke: #fff;
+      stroke-width: 2.5;
+    }
+    .gauge-value {
+      fill: #111;
+      font-size: 26px;
+      font-weight: 700;
+    }
+    .gauge-warning {
+      min-height: 20px;
+      margin: 10px 0 0;
+      color: #d71920;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      visibility: hidden;
+    }
+    .gauge-warning.active {
+      visibility: visible;
+    }
+    .BCM-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin: 18px auto 0;
+      text-align: center;
+      align-items: stretch;
+    }
+    .BCM-grid > div {
+      display: grid;
+      grid-template-rows: 36px auto;
+      align-items: start;
+      gap: 6px;
+    }
+    .BCM-grid h2 {
+      font-size: 14px;
+      margin: 0;
+      line-height: 1.2;
+      display: flex;
+      align-items: end;
+      justify-content: center;
+    }
+    .BCM-grid p {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
   </style>
 </head>
 <body>
@@ -30,11 +196,16 @@
           <select id="LPI">
             <option value="LPI">Select LPI</option>
           </select>
-        </div>
       </div>
 
       <div class="label">Desired BCM</div>
-      <input type="number" step="0.1" id="bcmVolume" value="0.0" />
+      <div class="bcm-control">
+        <input type="number" step="0.1" id="bcmVolume" value="0.0" />
+        <div class="bcm-step-buttons">
+          <button type="button" id="decreaseBcm" class="bcm-step-button" aria-label="Decrease desired BCM">-</button>
+          <button type="button" id="increaseBcm" class="bcm-step-button" aria-label="Increase desired BCM">+</button>
+        </div>
+      </div>
 
       <div class="BCM-grid">
         <div id="ultraflow box">
@@ -52,26 +223,19 @@
       </div>
 
       <div class="gauge">
-        <svg viewBox="0 0 200 100">
-          <defs>
-            <linearGradient id="arcGradient" gradientUnits="userSpaceOnUse" x1="10" y1="90" x2="190" y2="90">
-              <stop offset="0%" stop-color="red"/>
-              <stop offset="45%" stop-color="yellow"/>
-              <stop offset="50%" stop-color="green"/>
-              <stop offset="55%" stop-color="yellow"/>
-              <stop offset="100%" stop-color="red"/>
-            </linearGradient>
-          </defs>
-
-          <!-- background arc -->
-          <path id="seg1" class="gauge-seg" stroke="url(#arcGradient)" stroke-width="10" fill="none" d="M10,90 A90,90 0 0,1 190,90"/>
-          <!-- needle -->
-          <line id="needle" x1="100" y1="90" x2="10" y2="90" class="needle"/>
-          <!-- label under gauge -->
-          <text id="gaugeLabel" x="100" y="105" text-anchor="middle"></text>
+        <svg viewBox="0 0 260 176" role="img" aria-labelledby="gaugeTitle">
+          <title id="gaugeTitle">BCM volume gauge</title>
+          <path id="gaugeTrack" class="gauge-track" d="M30,120 A100,100 0 0,1 230,120"></path>
+          <g id="rangeSegments"></g>
+          <g id="gaugeTicks"></g>
+          <line id="needle" x1="130" y1="120" x2="130" y2="35" class="needle"/>
+          <circle cx="130" cy="120" r="7" class="needle-cap"></circle>
+          <text id="gaugeLabel" class="gauge-value" x="130" y="162" text-anchor="middle"></text>
         </svg>
       </div>
+      <p id="gaugeWarning" class="gauge-warning" role="alert">Please contact a sales representative</p>
     </div>
+  </div>
 
   <script>
     const lpis = [
@@ -331,16 +495,19 @@
 
     // ---- ANILOX VOLUME CALCULATOR ----
     const lpiEl           = document.getElementById('LPI');
-    const gaugeArc        = document.getElementById('gaugeArc');
+    const rangeSegments   = document.getElementById('rangeSegments');
+    const gaugeTicks      = document.getElementById('gaugeTicks');
     const needle          = document.getElementById('needle');
     const gaugeLabel      = document.getElementById('gaugeLabel');
+    const gaugeWarning    = document.getElementById('gaugeWarning');
     const ultraflowValueEl = document.getElementById('ultraflow value');
     const ultimateValueEl = document.getElementById('ultimate value');
     const admiralValueEl  = document.getElementById('admiral value');
     const bcmVolumeEl     = document.getElementById('bcmVolume');
-    const arcGreen        = document.querySelector('#arcGradient stop:nth-child(3)');
-    const arcYellow1       = document.querySelector('#arcGradient stop:nth-child(2)');
-    const arcYellow2          = document.querySelector('#arcGradient stop:nth-child(4)');
+    const decreaseBcmEl   = document.getElementById('decreaseBcm');
+    const increaseBcmEl   = document.getElementById('increaseBcm');
+    const gaugeCenter = { x: 130, y: 120 };
+    const gaugeRadius = 100;
 
     // Populate LPI dropdown
     lpis.forEach(item => {
@@ -364,53 +531,157 @@
         bcmVolumeEl.max = lpiData.max;
         // Optionally reset value to min or ultimate
         bcmVolumeEl.value = lpiData.ultimate?.toFixed(1) || lpiData.min;
-        arcGreen.setAttribute('offset', `${(lpiData.ultimate / lpiData.max) * 100}%`);
-        arcYellow1.setAttribute('offset', `${(lpiData.ultraflowMin / lpiData.max) * 100}%`);
-        arcGreen.setAttribute('offset', `${(lpiData.ultimate / lpiData.max) * 100}%`);
-        arcYellow2.setAttribute('offset', `${(lpiData.admiralMin / lpiData.max) * 100 || (lpiData.ultraflowMax / lpiData.max) * 100}%`);
+        renderGaugeRanges(lpiData);
       }
       updateGauge();
     });
 
-    // Update value of bcmVolumeEl when LPI changes
-    lpiEl.addEventListener('change', () => {
-      const selectedLPI = parseInt(lpiEl.value);
-      const lpiData = lpis.find(item => item.lpi === selectedLPI);
-      if (lpiData) {
-        bcmVolumeEl.value = lpiData.ultimate.toFixed(1);
-        updateGauge();
-      }
-    });
-
     // Update gauge based on BCM input
     bcmVolumeEl.addEventListener('input', updateGauge);
+    decreaseBcmEl.addEventListener('click', () => stepBcm(-1));
+    increaseBcmEl.addEventListener('click', () => stepBcm(1));
 
-    
+    function valueToAngle(value, lpiData) {
+      const percentage = (value - lpiData.min) / (lpiData.max - lpiData.min);
+      return -90 + (180 * Math.max(0, Math.min(1, percentage)));
+    }
+
+    function getSelectedLpiData() {
+      const selectedLPI = parseInt(lpiEl.value);
+      return lpis.find(item => item.lpi === selectedLPI);
+    }
+
+    function clampBcmValue(value, lpiData) {
+      if (!lpiData) return value;
+      return Math.max(lpiData.min, Math.min(lpiData.max, value));
+    }
+
+    function stepBcm(direction) {
+      const lpiData = getSelectedLpiData();
+      const currentValue = parseFloat(bcmVolumeEl.value) || 0;
+      const step = parseFloat(bcmVolumeEl.step) || 0.1;
+      const nextValue = clampBcmValue(currentValue + (direction * step), lpiData);
+
+      bcmVolumeEl.value = nextValue.toFixed(1);
+      updateGauge();
+    }
+
+    function pointOnGauge(angle) {
+      return pointAtRadius(angle, gaugeRadius);
+    }
+
+    function pointAtRadius(angle, radius) {
+      const radians = (angle - 90) * Math.PI / 180;
+      return {
+        x: gaugeCenter.x + (radius * Math.cos(radians)),
+        y: gaugeCenter.y + (radius * Math.sin(radians)),
+      };
+    }
+
+    function describeArc(startValue, endValue, lpiData) {
+      const startAngle = valueToAngle(startValue, lpiData);
+      const endAngle = valueToAngle(endValue, lpiData);
+      const start = pointOnGauge(startAngle);
+      const end = pointOnGauge(endAngle);
+      const largeArcFlag = endAngle - startAngle <= 180 ? 0 : 1;
+
+      return `M ${start.x.toFixed(2)} ${start.y.toFixed(2)} A ${gaugeRadius} ${gaugeRadius} 0 ${largeArcFlag} 1 ${end.x.toFixed(2)} ${end.y.toFixed(2)}`;
+    }
+
+    function addRange(startValue, endValue, lpiData, className) {
+      if (typeof startValue !== 'number' || typeof endValue !== 'number') return;
+      const start = Math.max(lpiData.min, Math.min(lpiData.max, startValue));
+      const end = Math.max(lpiData.min, Math.min(lpiData.max, endValue));
+      if (end <= start) return;
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('class', className);
+      path.setAttribute('d', describeArc(start, end, lpiData));
+      rangeSegments.appendChild(path);
+    }
+
+    function formatTickValue(value) {
+      return Number.isInteger(value) ? `${value}` : value.toFixed(1);
+    }
+
+    function renderGaugeTicks(lpiData) {
+      gaugeTicks.innerHTML = '';
+      const tickCount = 30;
+
+      for (let i = 0; i <= tickCount; i++) {
+        const value = lpiData.min + ((lpiData.max - lpiData.min) * i / tickCount);
+        const isMajorTick = i % 5 === 0;
+        const angle = valueToAngle(value, lpiData);
+        const inner = pointAtRadius(angle, isMajorTick ? 79 : 88);
+        const outer = pointAtRadius(angle, isMajorTick ? 121 : 117);
+        const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        tick.setAttribute('class', `gauge-tick ${isMajorTick ? 'gauge-tick-major' : 'gauge-tick-minor'}`);
+        tick.setAttribute('x1', inner.x.toFixed(2));
+        tick.setAttribute('y1', inner.y.toFixed(2));
+        tick.setAttribute('x2', outer.x.toFixed(2));
+        tick.setAttribute('y2', outer.y.toFixed(2));
+        gaugeTicks.appendChild(tick);
+
+        if (isMajorTick) {
+          const labelPoint = pointAtRadius(angle, 134);
+          const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          label.setAttribute('class', 'gauge-tick-label');
+          label.setAttribute('x', labelPoint.x.toFixed(2));
+          label.setAttribute('y', labelPoint.y.toFixed(2));
+          label.setAttribute('text-anchor', 'middle');
+          label.setAttribute('dominant-baseline', 'middle');
+          label.textContent = formatTickValue(value);
+          gaugeTicks.appendChild(label);
+        }
+      }
+    }
+
+    function renderGaugeRanges(lpiData) {
+      rangeSegments.innerHTML = '';
+      addRange(lpiData.ultraflowMin, lpiData.ultraflowMax, lpiData, 'gauge-range');
+      addRange(lpiData.admiralMin, lpiData.admiralMax, lpiData, 'gauge-range');
+
+      if (typeof lpiData.ultimate === 'number') {
+        const idealWidth = Math.max((lpiData.max - lpiData.min) * 0.055, 0.2);
+        addRange(
+          lpiData.ultimate - idealWidth / 2,
+          lpiData.ultimate + idealWidth / 2,
+          lpiData,
+          'gauge-ideal'
+        );
+      }
+
+      renderGaugeTicks(lpiData);
+    }
+
+    function isInsideRange(value, min, max) {
+      return typeof min === 'number' && typeof max === 'number' && value >= min && value <= max;
+    }
+
+    function isInRedZone(value, lpiData) {
+      const inUltraflowRange = isInsideRange(value, lpiData.ultraflowMin, lpiData.ultraflowMax);
+      const inAdmiralRange = isInsideRange(value, lpiData.admiralMin, lpiData.admiralMax);
+
+      return !inUltraflowRange && !inAdmiralRange;
+    }
+
+    function updateWarning(showWarning) {
+      gaugeWarning.classList.toggle('active', showWarning);
+    }
+
     function updateGauge() {
       const bcmValue = parseFloat(bcmVolumeEl.value);
-      const selectedLPI = parseInt(lpiEl.value);
-      const lpiData = lpis.find(item => item.lpi === selectedLPI);
+      const lpiData = getSelectedLpiData();
 
-      if (lpiData) {
-        // Calculate gauge value
-        const min = lpiData.min;
-        const max = lpiData.max;
-        const range = max - min;
-        const ultraflowMin = lpiData.ultraflowMin;
-        const ultraflowMax = lpiData.ultraflowMax;
-        const admiralMin = lpiData.admiralMin || 0;
-        const admiralMax = lpiData.admiralMax || 0;
-        const percentage = (bcmValue - min) / range;
-
-        // Clamp percentage between 0 and 1
-        const clampedPercentage = Math.max(0, Math.min(1, percentage));
-
-        // Rotate needle: 0deg (min, left) to 180deg (max, right), clockwise
-        const angle = 180 * clampedPercentage; // 0deg at min, 180deg at max (clockwise)
+      if (lpiData && Number.isFinite(bcmValue)) {
+        const angle = valueToAngle(bcmValue, lpiData);
         needle.style.transform = `rotate(${angle}deg)`;
-
-        // Update label
         gaugeLabel.textContent = `${bcmValue.toFixed(1)} BCM`;
+        updateWarning(isInRedZone(bcmValue, lpiData));
+      } else {
+        needle.style.transform = 'rotate(-90deg)';
+        gaugeLabel.textContent = '-';
+        updateWarning(false);
       }
     }
 
