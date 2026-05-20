@@ -153,6 +153,35 @@
       text-align: center;
       visibility: hidden;
     }
+    #warningButton {
+      display: block;
+      width: fit-content;
+      margin: 12px auto 0;
+      padding: 10px 18px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--cts-blue);
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    #warningButton:hover {
+      scale: 1.1;
+    }
+    #warningPhone {
+      display: block;
+      width: fit-content;
+      margin: 10px auto 0;
+      text-decoration: none;
+      color: var(--cts-blue);
+      text-align: center;
+    }
+    #warningPhone::before {
+      content: "\260E ";
+      margin-right: .5em;
+    }
     .gauge-warning.active {
       visibility: visible;
     }
@@ -234,6 +263,8 @@
         </svg>
       </div>
       <p id="gaugeWarning" class="gauge-warning" role="alert">Please contact a sales representative</p>
+      <a id="warningButton" class="gauge-warning" href="mailto:service@ctsindustries.com">Email Us</a>
+      <a id="warningPhone" class="gauge-warning" href="tel:7707483497">770-748-3497</a>
     </div>
   </div>
 
@@ -500,6 +531,8 @@
     const needle          = document.getElementById('needle');
     const gaugeLabel      = document.getElementById('gaugeLabel');
     const gaugeWarning    = document.getElementById('gaugeWarning');
+    const warningButton   = document.getElementById('warningButton');
+    const warningPhone    = document.getElementById('warningPhone');
     const ultraflowValueEl = document.getElementById('ultraflow value');
     const ultimateValueEl = document.getElementById('ultimate value');
     const admiralValueEl  = document.getElementById('admiral value');
@@ -667,6 +700,8 @@
 
     function updateWarning(showWarning) {
       gaugeWarning.classList.toggle('active', showWarning);
+      warningButton.classList.toggle('active', showWarning);
+      warningPhone.classList.toggle('active', showWarning);
     }
 
     function updateGauge() {
