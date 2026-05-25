@@ -422,7 +422,7 @@
         admiralMin: 5.0,
         admiralMax: 6.6,
         min: 0,
-        max: 6,
+        max: 8,
       },
       {
         lpi: 600,
@@ -541,6 +541,8 @@
     const increaseBcmEl   = document.getElementById('increaseBcm');
     const gaugeCenter = { x: 130, y: 120 };
     const gaugeRadius = 100;
+    const bcmStepSize = 0.1;
+    const visualRangePadding = bcmStepSize / 2;
 
     // Populate LPI dropdown
     lpis.forEach(item => {
@@ -592,7 +594,7 @@
     function stepBcm(direction) {
       const lpiData = getSelectedLpiData();
       const currentValue = parseFloat(bcmVolumeEl.value) || 0;
-      const step = parseFloat(bcmVolumeEl.step) || 0.1;
+      const step = parseFloat(bcmVolumeEl.step) || bcmStepSize;
       const nextValue = clampBcmValue(currentValue + (direction * step), lpiData);
 
       bcmVolumeEl.value = nextValue.toFixed(1);
@@ -622,7 +624,7 @@
     }
 
     function addRange(startValue, endValue, lpiData, className) {
-      if (typeof startValue !== 'number' || typeof endValue !== 'number') return;
+      if (!Number.isFinite(startValue) || !Number.isFinite(endValue)) return;
       const start = Math.max(lpiData.min, Math.min(lpiData.max, startValue));
       const end = Math.max(lpiData.min, Math.min(lpiData.max, endValue));
       if (end <= start) return;
@@ -671,8 +673,18 @@
 
     function renderGaugeRanges(lpiData) {
       rangeSegments.innerHTML = '';
-      addRange(lpiData.ultraflowMin, lpiData.ultraflowMax, lpiData, 'gauge-range');
-      addRange(lpiData.admiralMin, lpiData.admiralMax, lpiData, 'gauge-range');
+      addRange(
+        lpiData.ultraflowMin - visualRangePadding,
+        lpiData.ultraflowMax + visualRangePadding,
+        lpiData,
+        'gauge-range'
+      );
+      addRange(
+        lpiData.admiralMin - visualRangePadding,
+        lpiData.admiralMax + visualRangePadding,
+        lpiData,
+        'gauge-range'
+      );
 
       if (typeof lpiData.ultimate === 'number') {
         const idealWidth = Math.max((lpiData.max - lpiData.min) * 0.055, 0.2);
